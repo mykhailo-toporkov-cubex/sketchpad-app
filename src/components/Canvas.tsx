@@ -1,51 +1,47 @@
-import { useRef, useEffect } from "react";
+import { useState } from "react";
 import styled from "@emotion/styled";
+import { useAppSelector } from "../hooks/storeHooks";
+import useDraw from "../hooks/useDraw";
 
 const View = styled.canvas`
   border: 1px solid black;
+  cursor: crosshair;
 `;
 
 const Canvas = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const { canvasRef, context } = useDraw();
+  const { brush_color } = useAppSelector((state) => state.settings);
+  const [draw, setDraw] = useState(false);
 
-  useEffect(() => {
-    const canvas = canvasRef.current!;
-    const ctx = canvas.getContext("2d")!;
-    canvas.height = 600;
-    canvas.width = 800;
-    let draw = false;
+  const startPosition = () => setDraw(true);
 
-    const startPosition = () => {
-      draw = true;
-    };
+  const endPosition = () => {
+    setDraw(false);
+    context?.beginPath();
+  };
 
-    const endPosition = () => {
-      draw = false;
-      ctx.beginPath()
-    };
+  const move = (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
+    const ctx = context;
 
-    const move = (e: MouseEvent) => {
-      if (!draw) return;
-      ctx.lineWidth = 10; // var
-      ctx.lineCap = "round"; // var
-      ctx.strokeStyle = 'red' // var
+    if (!draw || !ctx) return;
+    ctx.lineWidth = 1; // var
+    ctx.lineCap = "round"; // var
+    ctx.strokeStyle = brush_color; // var
 
-      ctx.lineTo(e.clientX, e.clientY);
-      ctx.stroke();
-    };
+    ctx.lineTo(e.clientX, e.clientY);
+    ctx.stroke();
+  };
 
-    canvas.addEventListener("mousedown", startPosition);
-    canvas.addEventListener("mouseup", endPosition);
-    canvas.addEventListener("mousemove", move);
-
-    return () => {
-      canvas.removeEventListener("mousedown", startPosition);
-      canvas.removeEventListener("mouseup", endPosition);
-      canvas.removeEventListener("mousemove", move);
-    };
-  }, []);
-
-  return <View ref={canvasRef} />;
+  return (
+    <>
+      <View
+        ref={canvasRef}
+        onMouseMove={move}
+        onMouseDown={startPosition}
+        onMouseUp={endPosition}
+      />
+    </>
+  );
 };
 
 export default Canvas;
