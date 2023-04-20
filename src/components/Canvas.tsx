@@ -28,7 +28,7 @@ const Canvas = () => {
     ctx.lineCap = "round"; // var
     ctx.strokeStyle = brush_color; // var
 
-    ctx.lineTo(e.clientX, e.clientY);
+    ctx.lineTo(e.clientX, e.clientY - 20);
     ctx.stroke();
   };
 

@@ -1,4 +1,3 @@
-import React from "react";
 import { useAppDispatch } from "../hooks/storeHooks";
 import { changeBrushColor } from "../store/slices/settings";
 
